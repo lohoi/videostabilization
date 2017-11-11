@@ -11,7 +11,7 @@ if __name__ == "__main__":
         print("Mission: ", ret)
 
         # Our operations on the frame come here
-        3gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Display the resulting frame
 
