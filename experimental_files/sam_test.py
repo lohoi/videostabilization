@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("../media/test_vid_eric.mp4")
+    cap = cv2.VideoCapture("../media/drop.avi")
     while(True):
         # Capture frame-by-frame
         ret, frame = cap.read()
