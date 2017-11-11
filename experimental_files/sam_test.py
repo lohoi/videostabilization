@@ -4,18 +4,18 @@ import cv2
 import numpy as np
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("../media/test_vid_eric.mp4")
+    cap = cv2.VideoCapture('/storage/school/computer_vision_442/eecs442_final_project_video_stabilization/media/test_vid_eric.mp4')
     while(True):
         # Capture frame-by-frame
         ret, frame = cap.read()
         print("Mission: ", ret)
+        if ret:
+            # Our operations on the frame come here
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # Our operations on the frame come here
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # Display the resulting frame
 
-        # Display the resulting frame
-
-        cv2.imshow('frame', gray)
+            cv2.imshow('frame', gray)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
