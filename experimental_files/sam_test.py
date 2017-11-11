@@ -11,12 +11,12 @@ if __name__ == "__main__":
         print("Mission: ", ret)
 
         # Our operations on the frame come here
-        #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        3gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Display the resulting frame
 
-        cv2.imshow('frame',frame)
-        if cv2waitKey(1) & 0xFF == ord('q'):
+        cv2.imshow('frame', gray)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     # When everything done, release the capture
