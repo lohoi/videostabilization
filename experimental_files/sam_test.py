@@ -9,10 +9,9 @@ if __name__ == "__main__":
         # Capture frame-by-frame
         ret, frame = cap.read()
         print("Mission: ", ret)
-        if ret:
-            # Our operations on the frame come here
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
+        if not ret:
+            print("End of video.")
+            break;
             # Display the resulting frame
 
             cv2.imshow('frame', gray)
