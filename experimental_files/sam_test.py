@@ -8,13 +8,13 @@ if __name__ == "__main__":
     while(True):
         # Capture frame-by-frame
         ret, frame = cap.read()
-        print("Mission: ", ret)
         if not ret:
             print("End of video.")
             break;
             # Display the resulting frame
 
-            cv2.imshow('frame', gray)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        cv2.imshow('frame', gray)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
