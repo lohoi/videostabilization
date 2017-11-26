@@ -6,3 +6,4 @@ from synthesize_path import *
 
 if __name__ == "__main__":
     print("Yay")
+

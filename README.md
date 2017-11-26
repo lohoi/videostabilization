@@ -11,7 +11,8 @@ opencv
 
 
 ## Project Schema
-1. Estimating the original path
-2. Estimating a new smooth camera path
-3. Synthesize the stable video using the estimated smooth path
+    1. Estimating the original path
+    2. Estimating a new smooth camera path
+    3. Synthesize the stable video using the estimated smooth path
+
 # TODO
