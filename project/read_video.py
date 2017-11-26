@@ -13,6 +13,10 @@ def read_video(filename, isGray=True):
     frameWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frameHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+    if not frameCount:
+        print 'Video Not Found.'
+        exit(1)
+
     if isGray:
         buf = np.empty((frameCount, frameHeight, frameWidth), np.dtype('uint8'))
     else:
@@ -33,11 +37,14 @@ def read_video(filename, isGray=True):
             print 'Failed opening the video'
             raise
 
+
     cap.release()
     cv2.destroyAllWindows()
 
     # print 'frameCount:', frameCount
     # print 'frameHeight:', frameHeight
     # print 'frameWidth:', frameWidth
+    # cv2.imshow('frame', buf[9])
+    # cv2.waitKey(0)
 
     return buf

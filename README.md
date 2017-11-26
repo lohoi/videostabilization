@@ -4,8 +4,9 @@ Final Project for EECS 442: Computer Vision Fall 2017. Project by Albert Lo, Eri
 ## Getting Started
 Dependencies:
 ...
-python
-opencv
+python 2.7
+opencv 3.3 
+opencv-contrib-python (for SIFT)
 ...
 ## Usage
 
