@@ -14,7 +14,8 @@ def main():
     vid = read_video(filename)
 
     # 1.) Estimate original camera path
-    F = estimate_path(vid)
+    F = estimate_path(vid, method='NN')
+    
     # 2.) Estimate new camera path
     # 3.) Synthesize video with new camera path
 
