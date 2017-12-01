@@ -57,7 +57,7 @@ def estimate_path(vid_, method='NN'):
                     # David Lowe's NN ratio test
                     parsed_matches.append(m)
 
-        draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
+        # draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
         X = []
         Y = []
         for m in parsed_matches:
