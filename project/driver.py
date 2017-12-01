@@ -15,9 +15,12 @@ def main():
 
     # 1.) Estimate original camera path
     F, C = estimate_path(vid, method='L2')
-    
+
     # 2.) Estimate new camera path
     # 3.) Synthesize video with new camera path
+    vid_opt = synthesize_path(vid, C);
+
+    # write video
 
 if __name__ == "__main__":
     main()
