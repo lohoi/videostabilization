@@ -1,7 +1,22 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 
-def drawMatches(img1, kp1, img2, kp2, matches):
+def play_video(filename):
+    '''Plays video.'''
+    pass
+
+def plot_path(C_):
+    '''Plot estimated path'''
+    X = []
+    Y = []
+    for path in C_:
+        X.append(path[0,2])
+        Y.append(path[1,2])
+    plt.plot(X,Y,'r--')
+    plt.show()
+
+def draw_matches(img1, kp1, img2, kp2, matches):
     """
     source: https://stackoverflow.com/questions/20259025/
             module-object-has-no-attribute-drawmatches-opencv-python

@@ -4,12 +4,12 @@
 
 import cv2
 import numpy as np
-from helper import drawMatches
+from helper import *
 
 def estimate_transform(matches_, X, Y):
     '''Input: list of match objects
     Return: a 2x3 affine transform matrix
-    Basically uses inv(X'X)X'Y.
+    Basically uses inv(1X'X)X'Y.
     to compute the affine transformation matrix'''
     # Note: Using linear regression may be noisy b/c it 
     # factors in the tails. Try RANSAC in future?
@@ -57,7 +57,7 @@ def estimate_path(vid_, method='NN'):
                     # David Lowe's NN ratio test
                     parsed_matches.append(m)
 
-        # drawMatches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
+        draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
         X = []
         Y = []
         for m in parsed_matches:
@@ -93,4 +93,17 @@ def estimate_path(vid_, method='NN'):
         prev_kp = curr_kp
         prev_des = curr_des
     assert len(F) == f_count-1, 'estimate_path: frames mismatch'
-    return F
+
+    '''Given the pairwise transforms, plot the estimated path'''
+    num_frames = len(F)
+    C = []
+    C.append(F[0])
+
+    plot_path(F)
+
+    for i in range(1, len(F)):
+        C.append(np.dot(F[i], C[i-1]))
+
+    plot_path(C)
+
+    return F, C

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+2#!/usr/bin/env python
 '''Run Video Stabilization Algorithm.'''
 from read_video import *
 from estimate_path import *
@@ -14,7 +14,7 @@ def main():
     vid = read_video(filename)
 
     # 1.) Estimate original camera path
-    F = estimate_path(vid, method='NN')
+    F, C = estimate_path(vid, method='L2')
     
     # 2.) Estimate new camera path
     # 3.) Synthesize video with new camera path
