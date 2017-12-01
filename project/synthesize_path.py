@@ -8,7 +8,7 @@ def synthesize_path(vid_, p_opt):
 
     vid_opt = vid_;
     for i in range(1, f_count):
-        m_affine = p_opt[0:1, :]
+        m_affine = p_opt[0:1, :, i]
         warpAffine(vid_[i], vid_opt[i], p_opt[i-1], vid_opt[i].size())
 
     return vid_opt
