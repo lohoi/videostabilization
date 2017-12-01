@@ -99,11 +99,11 @@ def estimate_path(vid_, method='NN'):
     C = []
     C.append(F[0])
 
-    plot_path(F)
+    # plot_path(F)
 
     for i in range(1, len(F)):
         C.append(np.dot(F[i], C[i-1]))
 
-    plot_path(C)
+    # plot_path(C)
 
     return F, C
