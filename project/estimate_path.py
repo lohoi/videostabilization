@@ -6,15 +6,15 @@ import cv2
 import numpy as np
 from helper import *
 
-def estimate_transform(matches_, X, Y):
+def estimate_transform(X, Y):
     '''Input: list of match objects
     Return: a 2x3 affine transform matrix
     Basically uses inv(1X'X)X'Y.
     to compute the affine transformation matrix'''
-    # Note: Using linear regression may be noisy b/c it 
+    # Note: Using linear regression may be noisy b/c it
     # factors in the tails. Try RANSAC in future?
     return np.dot(np.dot(np.linalg.pinv(np.dot(np.transpose(X), X)), np.transpose(X)), Y)
-    
+
 
 def estimate_path(vid_, method='NN'):
     # TODO: we can do an analysis on L2 vs NN here for SIFT
@@ -27,7 +27,7 @@ def estimate_path(vid_, method='NN'):
 
     print 'num frames:', f_count
 
-    if method == 'L2': 
+    if method == 'L2':
         bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
     elif method == 'NN':
         # kNN used David Lowe's ratio test as described in
@@ -64,7 +64,6 @@ def estimate_path(vid_, method='NN'):
             X.append(prev_kp[m.queryIdx].pt)
             Y.append(curr_kp[m.trainIdx].pt)
 
-
         Y = np.array(Y)
         height1, width1 = Y.shape
         Y = np.append(Y, np.ones((height1,1)), axis=1)
@@ -76,7 +75,7 @@ def estimate_path(vid_, method='NN'):
         assert height1 == height2, 'estimate path: height mismatch'
         assert width1 == width2, 'estimate path: width mismatch'
         assert width1 == 2, 'estimate path: incorrect width'
-        
+
         A = estimate_transform(parsed_matches, X, Y)
         A = np.append(A, np.ones((1,3)), axis=0)
         A[2,0] = 0
