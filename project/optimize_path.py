@@ -5,9 +5,16 @@ import pickle
 
 def optimizePathTransforms(F, vid_shape, crop_ratio):
     DoF = 6
+    affine_weighting = [1, 1, 100, 100, 100, 100]
+    w = [10, 1, 100]
+    weighting
     # Set up the minimization equation
     minimization = np.zeros(4 * vid_shape[0] * DoF)
-    
+    for i in range(vid_shape[0]):
+        for j in range(DoF):
+            minimization[DoF * i + j] = w[0] * affine_weighting[j] 
+            minimization[vid_shape[0] * DoF + DoF * i + j] = w[1] * affine_weighting[j] 
+            minimization[2 * vid_shape[0] * DoF + DoF * i + j] = w[2] * affine_weighting[j] 
     minimization = cvxopt.matrix(minimization)
     G = []
     h = []
@@ -26,7 +33,9 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
     
     # Inclusion constraints
 
+    # Transpose G and turn it into a matrix for cvxopt to be in the correct form
     G = cvxopt.matrix(np.array(G).T)
+    # Turn h into a matrix to be used in the correct form
     h = cvxopt.matrix(h)
     solution = cvxopt.solvers(minimization,G,h)
     pickle.dump(F, open("optimization.p", "wb"))
