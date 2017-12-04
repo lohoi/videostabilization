@@ -49,4 +49,6 @@ def read_video(filename, isGray=True):
     buf = skvideo.io.vread(filename, outputdict={"-pix_fmt": "gray"})
     if not isGray:
         buf = skvideo.io.vread(filename)
+
+    print(buf.shape)
     return buf
