@@ -25,7 +25,7 @@ def main():
 
     F = pickle.load(open("F.p", "rb"))
     C = pickle.load(open("C.p", "rb"))
-    
+
     # 2.) Estimate new camera path
     crop_ratio = 0.8
     B = optimizePathTransforms(F, vid.shape, crop_ratio)
