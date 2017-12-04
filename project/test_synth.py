@@ -16,6 +16,5 @@ vid = read_video(filename)
 # F, C = estimate_path(vid, method='NN')
 F = pickle.load(open("F.p", "rb"))
 C = pickle.load(open("C.p", "rb"))
-print C
-vid_opt = synthesize_path(vid, C)
+vid_opt = synthesize_path(vid, F)
 write_video('../output.mp4', vid_opt)
