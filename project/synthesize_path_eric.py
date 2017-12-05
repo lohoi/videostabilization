@@ -1,4 +1,4 @@
-    #!/usr/bin/env python
+#!/usr/bin/env python
 import cv2
 import numpy as np
 from estimate_path import estimate_transform
@@ -12,13 +12,16 @@ def synthesize_path(vid_, p_opt, crop_ratio = 0.5):
     x_center = int(f_width/2)
     y_center = int(f_height/2)
 
-    x_cropped = int(f_width * crop_ratio)
-    y_cropped = int(f_height * crop_ratio)
+    cropped_width = int(f_width * crop_ratio)
+    cropped_height = int(f_height * crop_ratio)
+
+    outcrop_width = int((f_width * 1 - crop_ratio)/2);
+    outcrop_height = int((f_width * 1 - crop_ratio)/2);
 
     # grayscale for now, color_scale == 1
     # vid = vid_.reshape(f_count, f_height, f_width)
     vid = vid_[:, :, :, 0].copy()
-    vid_crop = np.zeros((f_count, y_cropped, x_cropped))
+    vid_crop = np.zeros((f_count, f_height, f_width))
     vid_smooth = np.zeros((f_count, f_height, f_width))
     vid_recon = np.zeros((f_count, f_height, f_width))
 
@@ -34,10 +37,10 @@ def synthesize_path(vid_, p_opt, crop_ratio = 0.5):
         X = []
 
         # cropped corners static
-        left_crop = int(x_center - x_cropped/2)
-        right_crop = int(x_center + x_cropped/2)
-        top_crop = int(y_center - y_cropped/2)
-        bot_crop = int(y_center + y_cropped/2)
+        left_crop = int(x_center - cropped_width/2)
+        right_crop = int(x_center + cropped_width/2)
+        top_crop = int(y_center - cropped_height/2)
+        bot_crop = int(y_center + cropped_height/2)
 
         # location of cropped corners 1 x 3
         # a = np.array([left_crop, top_crop, 1])
@@ -60,20 +63,17 @@ def synthesize_path(vid_, p_opt, crop_ratio = 0.5):
         x = np.array([a[0:2], b[0:2], c[0:2], d[0:2]])
 
         # cropped corners transformed
-        top = min(int(a[0]), 0)
-        bot = max(int(c[0]), y_cropped)
-        left = min(int(a[1]), 0)
-        right = max(int(c[1]), x_cropped)
+        top = max(int(a[0]), 0)
+        bot = min(int(c[0]), f_height)
+        left = max(int(a[1]), 0)
+        right = min(int(c[1]), f_width)
 
-        print i
-        print "{} {} x {} {}".format(top, bot, left, right)
+        # print i
+        # print "{} x {}".format(bot-top, right-left)
 
-
+        # vid_crop[i][top:bot, left:right] = vid[i][top:bot, left:right]
+        # vid_crop[i][top:bot, left:right] = cv2.warpAffine(vid[i][top:bot, left:right], m_stable_2x3, (right-left, bot-top))
         vid_crop[i][top:bot, left:right] = vid[i][top:bot, left:right]
-        cv2.imshow('crop transform', vid_crop[i])
-        cv2.waitKey(0)
-            # cv2.warpAffine(vid[i][left:right, top:bot], m_stable_2x3, !!(x_cropped, y_cropped))
-
 
         # location of reconstructed corners
         A = np.array([0, 0])
