@@ -4,10 +4,18 @@ import numpy as np
 from estimate_path import estimate_transform
 from write_video import *
 
+import pickle
+from read_video import *
+
 # Input:    original video
 #           optimal path transform
 #           crop ratio
-def synthesize_path(vid_, p_opt, crop_ratio = 0.8):
+# def synthesize_path(vid_, p_opt, crop_ratio = 0.8):
+def synthesize_path(crop_ratio = 0.8):
+    filename = './media/test_vid_eric.mp4'
+    vid_ = read_video(filename)
+    p_opt = pickle.load(open("./project/F.p", "rb"))
+    
     f_count, f_height, f_width, color_scale = vid_.shape
     print f_height
     print f_width
@@ -78,3 +86,7 @@ def synthesize_path(vid_, p_opt, crop_ratio = 0.8):
     write_video('../smoothed.mp4', vid_smooth)
 
     return vid_recon
+
+
+if __name__ == "__main__":
+    synthesize_path()
