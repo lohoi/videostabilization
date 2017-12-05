@@ -19,7 +19,7 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
     # Read resulting csv from matlab code
     p = []
     with open('p.csv', 'rb') as csvfile:
-        reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
             row_count = 0
             p_val = np.zeros((3,3))
