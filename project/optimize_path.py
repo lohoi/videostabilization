@@ -115,18 +115,61 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
             temp[e_t2[ind][0]] = e_t2[ind][1]
             G.append(temp)
             h.append(h_t1[ind] - h_t[ind])
-
-    for i in range(f_len - 3,f_len): # Getting the last few constraints with D P
-        # e1 constraints
-        print 'A'
+    #for i in range(f_len - 3,f_len): # Getting the last few constraints with D P
+    # Slack Variables are Positive Constraints
     for i in range(3 * DoF * f_len):
-        # Slack Variables are Positive Constraints
         slack = np.zeros(4 * DoF * f_len)
         slack[i] = -1
         G.append(slack.tolist())
         h.append(0)
     # Proximity Constraints
-    
+    for i in range(f_len):
+        # a_t, d_t constraints
+        # a_t
+        temp = np.zeros(4 * f_len * DoF)
+        temp[3 * DoF * f_len + i * DoF + 2] = 1
+        G.append(temp.tolist())
+        h.append(1.1)
+        G.append((-1 * temp).tolist())
+        h.append(-0.9)
+        # d_t
+        temp = np.zeros(4 * f_len * DoF)
+        temp[3 * DoF * f_len + i * DoF + 5] = 1
+        G.append(temp.tolist())
+        h.append(1.1)
+        G.append((-1 * temp).tolist())
+        h.append(0.9)
+        # b_t, c_t constraints
+        # b_t
+        temp = np.zeros(4 * f_len * DoF)
+        temp[3 * DoF * f_len + i * DoF + 3] = 1
+        G.append(temp.tolist())
+        h.append(0.1)
+        G.append((-1 * temp).tolist())
+        h.append(0.1)
+        # c_t
+        temp = np.zeros(4 * f_len * DoF)
+        temp[3 * DoF * f_len + i * DoF + 4] = 1
+        G.append(temp.tolist())
+        h.append(0.1)
+        G.append((-1 * temp).tolist())
+        h.append(0.1)
+        # b_t + c_t constraints
+        temp = np.zeros(4 * f_len * DoF)
+        temp[3 * DoF * f_len + i * DoF + 3] = 1
+        temp[3 * DoF * f_len + i * DoF + 4] = 1
+        G.append(temp.tolist())
+        h.append(0.05)
+        G.append((-1 * temp).tolist())
+        h.append(0.05)
+        #a_t - d_t constraints
+        temp = np.zeros(4 * f_len * DoF)
+        temp[3 * DoF * f_len + i * DoF + 2] = 1
+        temp[3 * DoF * f_len + i * DoF + 5] = -1
+        G.append(temp.tolist())
+        h.append(0.1)
+        G.append((-1 * temp).tolist())
+        h.append(0.1)
     # Inclusion constraints
 
     # Transpose G and turn it into a matrix for cvxopt to be in the correct form
