@@ -22,12 +22,11 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
         reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
         for row in reader:
             row_count = 0
-            p_val = np.zeros(3,3)
+            p_val = np.zeros((3,3))
             for ind, val in enumerate(row):
                 p_val[int(ind / 3), ind % 3] = val
             p_val[2,2] = 1
             p.append(p_val)    
-
-    #pickle.dump(solution, open("optimization.p", "wb"))
-    #solution = pickle.load(open("optimization.p", "rb"))
+    #pickle.dump(p.p, open("optimization.p", "wb"))
+    #solution = pickle.load(p..p", "rb"))
     return p
