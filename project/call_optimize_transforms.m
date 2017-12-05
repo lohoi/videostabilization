@@ -20,4 +20,5 @@ for i=1:num_frames-1
 end
 
 csvwrite('p.csv', p_csv);
-% p_values = optimizeTransforms(F, dims);
+
+exit
