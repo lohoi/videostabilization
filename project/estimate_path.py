@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 '''Return 2D parametric linear motion model
     at each instance of time.'''
-
 import cv2
 import numpy as np
 from helper import *
