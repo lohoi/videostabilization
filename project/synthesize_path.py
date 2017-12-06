@@ -10,11 +10,11 @@ from read_video import *
 # Input:    original video
 #           optimal path transform
 #           crop ratio
-# def synthesize_path(vid_, p_opt, crop_ratio = 0.8):
-def synthesize_path(crop_ratio = 0.8):
-    filename = './media/test_vid_eric.mp4'
-    vid_ = read_video(filename)
-    p_opt = pickle.load(open("./project/F.p", "rb"))
+def synthesize_path(vid_, p_opt, crop_ratio = 0.8):
+# def synthesize_path(crop_ratio = 0.8):
+    # filename = './media/test_vid_eric.mp4'
+    # vid_ = read_video(filename)
+    # p_opt = pickle.load(open("./project/F.p", "rb"))
     
     f_count, f_height, f_width, color_scale = vid_.shape
     x_center = int(f_width/2)
@@ -72,9 +72,11 @@ def synthesize_path(crop_ratio = 0.8):
         print "{} {} x {} {}".format(top, bot, left, right)
 
 
-        vid_crop[i][top:bot, left:right] = vid[i][top:bot, left:right]
+        # vid_crop[i][top:bot, left:right] = vid[i][top:bot, left:right]
+        
+        cv2.startWindowThread()
+        cv2.namedWindow('crop transform')
         cv2.imshow('crop transform', vid_crop[i])
-        cv2.waitKey(0)
             # cv2.warpAffine(vid[i][left:right, top:bot], m_stable_2x3, !!(x_cropped, y_cropped))
 
         # location of reconstructed corners
