@@ -12,15 +12,9 @@ def solve_path(F_, fc_, vid_height_, vid_width_):
 	prob = LpProblem('vidstab', pulp.LpMinimize)
 
 	## Parameters
-	# weights
-	w1 = 10
-	w2 = 1
-	w3 = 100
-
 	c1 = np.array([1, 1, 100, 100, 100, 100])
 	c2 = c1
 	c3 = c1
-
 
 	lb = [0.9, -0.1, -0.1, 0.9, -0.1, -0.05]
 
@@ -32,6 +26,16 @@ def solve_path(F_, fc_, vid_height_, vid_width_):
 	# Number of variables
 	n = fc # todo, change this to fc later
 	dof = 6
+
+	U = np.zeros((6,6))
+	U[2, 0] = 1
+	U[5, 3] = 1
+	U[3, 1] = 1
+	U[4, 2] = 1
+	U[2, 4] = 1
+	U[5, 4] = -1
+	U[3, 5] = 1
+	U[4, 5] = 1
 
 	# A vector of n binary variables
 	# 	x = LpVariable.matrix("x", list(range(fc)), 0, 1, LpInteger)
@@ -161,10 +165,14 @@ def solve_path(F_, fc_, vid_height_, vid_width_):
 			prob += e3[i][3] >= 0
 			prob += e3[i][4] >= 0
 			prob += e3[i][5] >= 0
-	# # Constraints
-	# d = [[randint(0,D) for i in range(n)] for j in range(m)]
-	# for j in range(m):
-	# 	prob += lpDot(d[j], x) + c[j] - e[j] == lpSum(d[j])/2
+	
+	for i in range(len(F)):
+		# proximity points
+		res = np.dot(p[i],U)
+		for j in range(len(lb)):
+			prob += lb[j] <= res[j]
+			prob += ub[j] >= res[j]
+
 
 	prob.solve()
 	# # # Print the value of the variables at the optimum
@@ -172,9 +180,9 @@ def solve_path(F_, fc_, vid_height_, vid_width_):
 		if 'p' in v.name:
 			print(v.name, "=", v.varValue)
 
-	# # Print the value of the objective
-	# print("objective=", value(prob.objective))
-	# return prob.objective
+	# Print the value of the objective
+	print("objective=", value(prob.objective))
+	return prob.objective
 	# return 0
 
 
