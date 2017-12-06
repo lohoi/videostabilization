@@ -4,11 +4,12 @@ import numpy as np
 from read_video import *
 import pickle
 
-from random import *
+import csv
+from estimate_path import *
 
 
 def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
-	print 'solve_path called with number of frames: ', fc_
+	print 'solve_path called'
 	prob = LpProblem('vidstab', pulp.LpMinimize)
 
 	## Parameters
@@ -21,7 +22,7 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	ub = [1.1, 0.1, 0.1, 1.1, 0.1, 0.05]
 
 	# Number of variables
-	n = fc_ # todo, change this to fc later
+	n = fc_
 	dof = 6 # affine transform
 
 	U = np.zeros((6,6))
@@ -45,10 +46,6 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	                [crop_x, crop_y + crop_h],
 	                [crop_x + crop_w, crop_y + crop_h]
 	            ];
-
-	# A vector of n binary variables
-	# 	x = LpVariable.matrix("x", list(range(fc)), 0, 1, LpInteger)
-	# x = LpVariable.matrix("x", list(range(n)), 0, 1, LpInteger)
 
 	# Slacks
 	# c = LpVariable.matrix("c", (c1,c1), 0)
@@ -175,16 +172,24 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 			prob += e3[i][4] >= 0
 			prob += e3[i][5] >= 0
 	
-	for i in range(len(F)):
+	for i in range(n):
 		# proximity points
-		res = np.dot(p[i],U)
-		for j in range(len(lb)):
-			prob += lb[j] <= res[j]
-			prob += ub[j] >= res[j]
+		prob += p[i][2] >= 0.9
+		prob += p[i][5] <= 1.1
+		prob += p[i][3] >= -0.1
+		prob += p[i][4] <= 0.1
+		prob += p[i][3] + p[i][4] >= -0.05
+		prob += p[i][3] + p[i][4] <= 0.05
+		prob += p[i][2] + i[i][5] >= -0.1
+		prob += p[i][2] + i[i][5] <= 0.1
+		# res = np.dot(p[i],U)
+		# for j in range(len(lb)):
+		# 	prob += lb[j] <= res[j]
+		# 	prob += ub[j] >= res[j]
 
 	for i in range(len(crop_points)):
 		# inclusion
-		for j in range(fc_):
+		for j in range(n):
 			temp1 = np.dot(np.array([1, 0, crop_points[i][0], crop_points[i][1], 0, 0]), np.transpose(p[j])) 
 			prob += 0 <= temp1
 			prob += vid_width_ >= temp1
@@ -198,7 +203,7 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	prob.solve()
 
 	l = []
-	B = [np.zeros((3,3)) for _ in range(fc)]
+	B = [np.zeros((3,3)) for _ in range(n)]
 	for v in prob.variables():
 		# print v.name, "=", v.varValue
 		# put the values into a B_matrix
@@ -226,20 +231,29 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 				B[idx][1,0] = v.varValue
 			elif coeff_idx == '5':
 				# d
-				B[idx][1,1] = v.varValue
-			else:
-				B[idx][2,2] = 1
+				B[idx][1,1] = v.varValue	
+			B[idx][2,2] = 1
 
 	# Print the value of the objective
 	print("objective=", value(prob.objective))
 	pickle.dump(F, open("B_albert.p", "wb"))
-	print('optimial path returning')
+	print(max(l))
+	print(min(l))
+	print(len(B))
+	with open('B_albert.csv', 'w+') as csvfile:
+		f_writer = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
+		for b in B:
+			f_writer.writerow([b[0,0]] + [b[0,1]] +  [b[0,2]] + [b[0,0]] + [b[1,1]] +  [b[1,2]] + [b[2,0]] + [b[2,1]] +  [b[2,2]])
+	print('optimal path returning')
 	return B
 	# return 0
 
 
 filename = '../media/test_vid_eric.mp4'
 vid = read_video(filename)
+F, C = estimate_path(vid, method='NN')
+pickle.dump(F, open("F.p", "wb"))
 fc, height, width, rgb = vid.shape
-F = pickle.load(open("F.p", "rb"))
+
+# F = pickle.load(open("F.p", "rb"))
 solve_path(F,fc,height, width)
