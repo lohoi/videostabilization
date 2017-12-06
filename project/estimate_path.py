@@ -52,7 +52,7 @@ def estimate_path(vid_, method='NN'):
         elif method == 'NN':
             matches = bf.knnMatch(prev_des, curr_des, k=2)
             for m, n in matches:
-                if m.distance < 0.80 * n.distance:
+                if m.distance < 0.50 * n.distance:
                     # David Lowe's NN ratio test
                     parsed_matches.append(m)
 
@@ -100,14 +100,15 @@ def estimate_path(vid_, method='NN'):
 
     '''Given the pairwise transforms, plot the estimated path'''
     num_frames = len(F)
-    C = []
-    C.append(F[0])
+    F = np.array(F)
+    # C = []
+    # C.append(F[0])
+    #
+    # # plot_path(F)
+    #
+    # for i in range(1, len(F)):
+    #     C.append(np.dot(F[i], C[i-1]))
+    #
+    # # plot_path(C)
 
-    # plot_path(F)
-
-    for i in range(1, len(F)):
-        C.append(np.dot(F[i], C[i-1]))
-
-    # plot_path(C)
-
-    return F, C
+    return F

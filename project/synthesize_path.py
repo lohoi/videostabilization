@@ -60,7 +60,12 @@ def synthesize_path(vid_, p_opt, crop_ratio = 0.5):
         d = np.dot(m_stable, np.transpose(d))
 
         # smooth transformed corners 4 x 2
-        x = np.array([a[0:2], b[0:2], c[0:2], d[0:2]])
+        # print m_stable
+        # print 'a', a
+        # print 'b', b
+        # print 'c', c
+
+        x = [a[0:2].tolist(), b[0:2].tolist(), c[0:2].tolist(), d[0:2].tolist()]
 
         # cropped corners transformed
         top = max(int(a[0]), 0)
@@ -76,19 +81,26 @@ def synthesize_path(vid_, p_opt, crop_ratio = 0.5):
         vid_crop[i][top:bot, left:right] = vid[i][top:bot, left:right]
 
         # location of reconstructed corners
-        A = np.array([0, 0])
-        B = np.array([0, f_height])
-        C = np.array([f_height, f_width])
-        D = np.array([0, f_width])
+        A = [0.0, 0.0]
+        B = [float(f_height), 0.0]
+        C = [float(f_height), float(f_width)]
+        D = [0.0, float(f_width)]
         # output coordinates 4 x 2
-        X = np.array([A, B, C, D])
-        height, width = X.shape
+        X = [A, B, C, D]
+        # height, width = X.shape
         # output coordinates 4 x 3
-        X = np.append(X, np.ones((height,1)), axis=1)
+        # X = np.append(X, np.ones((height,1)), axis=1)
 
         # estimate reconstuction transform  2 x 3
-        m_recon = estimate_transform(x, X)
-        vid_recon[i] = cv2.warpAffine(vid[i], m_recon, (f_width,f_height))
+        # m_recon = estimate_transform(x, X)
+        # src = np.array([cv2.Point2f(p) for p in x])
+        # dst = np.array([cv2.Point2f(p) for p in X])
+
+        # print src
+        # m_recon, mask = cv2.findHomography(src, dst, cv2.RANSAC)
+        m_recon, mask = cv2.findHomography(np.array(x), np.array(X), cv2.RANSAC)
+        # m_recon2 = m_recon[:-1,:]
+        vid_recon[i] = cv2.warpPerspective(vid[i], m_recon, (f_width,f_height))
 
         if i == 50:
             cv2.imwrite("../results/original_frame.png", vid_[i])

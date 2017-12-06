@@ -31,6 +31,6 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
                 p_val[int(ind / 3), ind % 3] = val
             p_val[2,2] = 1
             p.append(p_val)
-    pickle.dump(p, open("p.p", "wb"))
-    #p = pickle.load(p.p", "rb"))
+    # pickle.dump(p, open("p.p", "wb"))
+    # p = pickle.load(open("p.p", "rb"))
     return p
