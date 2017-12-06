@@ -57,30 +57,36 @@ def estimate_path(vid_, method='NN'):
                     parsed_matches.append(m)
 
         # draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
-        X = []
-        Y = []
-        for m in parsed_matches:
-            X.append(prev_kp[m.queryIdx].pt)
-            Y.append(curr_kp[m.trainIdx].pt)
+        # X = []
+        # Y = []
+        # for m in parsed_matches:
+        #     X.append(prev_kp[m.queryIdx].pt)
+        #     Y.append(curr_kp[m.trainIdx].pt)
+        #
+        # Y = np.array(Y)
+        # height1, width1 = Y.shape
+        # Y = np.append(Y, np.ones((height1,1)), axis=1)
+        #
+        # X = np.array(X)
+        # height2, width2 = X.shape
+        # # X = np.append(X, np.ones((height2,1)), axis=1)
+        #
+        # assert height1 == height2, 'estimate path: height mismatch'
+        # assert width1 == width2, 'estimate path: width mismatch'
+        # assert width1 == 2, 'estimate path: incorrect width'
+        #
+        # A = estimate_transform(X, Y)
+        # A = np.append(A, np.ones((1,3)), axis=0)
+        # A[2,0] = 0
+        # A[2,1] = 0
+        # F.append(A)
 
-        Y = np.array(Y)
-        height1, width1 = Y.shape
-        Y = np.append(Y, np.ones((height1,1)), axis=1)
+        src_pts = np.float32([prev_kp[m.queryIdx].pt for m in parsed_matches]).reshape(-1,1,2)
+        dst_pts = np.float32([curr_kp[m.trainIdx].pt for m in parsed_matches]).reshape(-1,1,2)
 
-        X = np.array(X)
-        height2, width2 = X.shape
-        # X = np.append(X, np.ones((height2,1)), axis=1)
+        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC)
+        F.append(M)
 
-        assert height1 == height2, 'estimate path: height mismatch'
-        assert width1 == width2, 'estimate path: width mismatch'
-        assert width1 == 2, 'estimate path: incorrect width'
-
-        A = estimate_transform(X, Y)
-        A = np.append(A, np.ones((1,3)), axis=0)
-        A[2,0] = 0
-        A[2,1] = 0
-
-        F.append(A)
 
         # print np.append(X[1],np.ones(1))
         # print A

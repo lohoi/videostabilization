@@ -15,7 +15,7 @@ def plot_path(C_):
     Y = [0]
     for transform in C_:
         frame_cum = np.dot(frame_cum, transform)
-        tep_point = np.dot(frame_cum, point)
+        temp_point = np.dot(frame_cum, point)
         X.append(temp_point[0,0])
         Y.append(temp_point[1,0])
     plt.subplot(1,2,1)
@@ -57,8 +57,8 @@ def draw_matches(img1, kp1, img2, kp2, matches):
     contrary to David Lowe's nearest-neighbor ratio-test as described
     in his SIFT paper.
 
-    This function takes in two images with their associated 
-    keypoints, as well as a list of DMatch data structure (matches) 
+    This function takes in two images with their associated
+    keypoints, as well as a list of DMatch data structure (matches)
     that contains which keypoints matched in which images.
 
     An image will be produced where a montage is shown with
@@ -68,7 +68,7 @@ def draw_matches(img1, kp1, img2, kp2, matches):
     between matching keypoints.
 
     img1,img2 - Grayscale images
-    kp1,kp2 - Detected list of keypoints through any of the OpenCV keypoint 
+    kp1,kp2 - Detected list of keypoints through any of the OpenCV keypoint
               detection algorithms
     matches - A list of matches of corresponding keypoints through any
               OpenCV keypoint matching algorithm
@@ -110,7 +110,7 @@ def draw_matches(img1, kp1, img2, kp2, matches):
         # radius 4
         # colour blue
         # thickness = 1
-        cv2.circle(out, (int(x1),int(y1)), 4, (255, 0, 0), 1)   
+        cv2.circle(out, (int(x1),int(y1)), 4, (255, 0, 0), 1)
         cv2.circle(out, (int(x2)+cols1,int(y2)), 4, (255, 0, 0), 1)
 
         # Draw a line in between the two points

@@ -13,12 +13,15 @@ end
 
 crop_ratio = 0.8;
 p_values = optimize_transforms(F, dims, crop_ratio);
-
 p_csv = zeros(num_frames-1, 6);
 for i=1:num_frames-1
-    p_csv(i,:) = p_values(:,i);
+    p_csv(i,:) = p_values(:,i)';
 end
-
 csvwrite('p.csv', p_csv);
 
-exit
+ps_values = cell2mat(optimizeTransforms(F, dims));
+for i=1:num_frames-1
+    j = (i-1) * 3 + 1;
+    ps_csv(i,:) = [ps_values(j,:), ps_values(j+1,:)];
+end
+csvwrite('p_ishit.csv', ps_csv);

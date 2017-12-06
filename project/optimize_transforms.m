@@ -84,6 +84,6 @@ function p = mat_to_col(R)
 end
 
 function p = p2p(p)
-    p = [p(3) p(4) p(1) p(5) p(6) p(2)];
+    p = [p(3) p(4) p(1) p(5) p(6) p(2)]';
 end
 
