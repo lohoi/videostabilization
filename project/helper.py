@@ -6,14 +6,14 @@ def play_video(filename):
     '''Plays video.'''
     pass
 
-def plot_path(C_):
+def plot_path(F_):
     '''Plot estimated path'''
     point = np.array([[0],[0],[1]])
-    frames = np.arange(len(C_) + 1)
+    frames = np.arange(len(F_) + 1)
     frame_cum = np.eye(3)
     X = [0]
     Y = [0]
-    for transform in C_:
+    for transform in F_:
         frame_cum = np.dot(frame_cum, transform)
         temp_point = np.dot(frame_cum, point)
         X.append(temp_point[0,0])
@@ -24,16 +24,16 @@ def plot_path(C_):
     plt.plot(frames,Y,'r--')
     plt.show()
 
-def plot_new_path(C_,B_):
+def plot_new_path(F_,B_):
     '''Plot estimated path'''
     point = np.array([[0],[0],[1]])
-    frames = np.arange(len(C_))
+    frames = np.arange(len(F_))
     frame_cum = np.eye(3)
     old_X = []
     old_Y = []
     new_X = []
     new_Y = []
-    for ind, transform in enumerate(C_):
+    for ind, transform in enumerate(F_):
         frame_cum = np.dot(frame_cum, transform)
         temp_point = np.dot(frame_cum, point)
         old_X.append(temp_point[0,0])
