@@ -17,7 +17,8 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
             f_writer.writerow([f[0,0]] + [f[0,1]] +  [f[0,2]] + [f[0,0]] + [f[1,1]] +  [f[1,2]] + [f[2,0]] + [f[2,1]] +  [f[2,2]])
 
     # Call matlab code
-    subprocess.call("/Applications/MATLAB.app/bin/matlab -r call_optimize_transforms rm -nodisplay", shell=True)
+    print "Calling Matlab CVX"
+    subprocess.call("/Applications/MATLAB.app/bin/matlab -r matlab_opt_transform rm -nodisplay", shell=True)
 
     # Read resulting csv from matlab code
     p = []
