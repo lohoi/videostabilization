@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+
+'''
+A failed attempt to use PuLP, a linear program solver package,
+to solve Algorithm 1 presented in the paper
+'''
+
 from pulp import *
 import numpy as np
 
@@ -10,58 +17,56 @@ from estimate_path import *
 
 def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	print 'solve_path called'
+	print 'width: ', vid_width_
+	print 'height: ', vid_height_
+	print 'fc: ', fc_
 	prob = LpProblem('vidstab', pulp.LpMinimize)
 
 	## Parameters
 	c1 = np.array([1, 1, 100, 100, 100, 100])
-	c2 = c1
-	c3 = c1
+	c2 = np.array([1, 1, 100, 100, 100, 100])
+	c3 = np.array([1, 1, 100, 100, 100, 100])
 
-	lb = [0.9, -0.1, -0.1, 0.9, -0.1, -0.05]
+	w1 = 10
+	w2 = 1
+	w3 = 100;
 
-	ub = [1.1, 0.1, 0.1, 1.1, 0.1, 0.05]
+	# lb = [0.9, -0.1, -0.1, 0.9, -0.1, -0.05]
+
+	# ub = [1.1, 0.1, 0.1, 1.1, 0.1, 0.05]
 
 	# Number of variables
-	n = fc_
+	n = fc_ - 1
 	dof = 6 # affine transform
 
-	U = np.zeros((6,6))
-	U[2, 0] = 1
-	U[5, 3] = 1
-	U[3, 1] = 1
-	U[4, 2] = 1
-	U[2, 4] = 1
-	U[5, 4] = -1
-	U[3, 5] = 1
-	U[4, 5] = 1
-
-	center_x = int(vid_width_ / 2);
-	center_y = int(vid_height_ / 2);
+	center_x = int(vid_height_/ 2);
+	center_y = int(vid_width_ / 2);
 	crop_w = int(vid_width_ * crop_ratio_);
 	crop_h = int(vid_height_ * crop_ratio_);
-	crop_x = int(center_x - crop_w / 2);
-	crop_y = int(center_y - crop_h / 2);
-	crop_points = [ [crop_x, crop_y],
-	                [crop_x + crop_w, crop_y],
-	                [crop_x, crop_y + crop_h],
-	                [crop_x + crop_w, crop_y + crop_h]
+	
+
+	crop_x = int(center_x - crop_h / 2);
+	crop_y = int(center_y - crop_w / 2);
+	crop_points = [
+					[crop_x, crop_y],
+	                [crop_x + crop_h, crop_y],
+	                [crop_x, crop_y + crop_w],
+	                [crop_x + crop_h, crop_y + crop_w]
 	            ];
+
+	print crop_points
 
 	# Slacks
 	# c = LpVariable.matrix("c", (c1,c1), 0)
 	e1 = LpVariable.matrix('e1', (list(range(n)), list(range(dof))))
 	e2 = LpVariable.matrix('e2', (list(range(n)), list(range(dof))))
 	e3 = LpVariable.matrix('e3', (list(range(n)), list(range(dof))))
-	p = LpVariable.matrix('p', (list(range(n)), list(range(dof))))
-	# e3 = 
+	p = LpVariable.matrix('p', (list(range(n+1)), list(range(dof))))
 
-	# print 'len', len(e1)
-	# print 'len2', len(e1[0])
-	# # Objective: minimize c'e
-	prob += lpSum(np.dot(e1, c1)) + lpSum(np.dot(e2,c2)) + lpSum(np.dot(e3,c3))
-	# print prob
+	# Objective: minimize c'e
+	prob += lpSum(w1 * np.dot(e1, c1) + w2 * np.dot(e2,c2) + w3 * np.dot(e3,c3))
 	# prob +=  lpSum([c1[i] * e1[i] for i in range(len(c1))]) 
-	for i in range(n - 4):
+	for i in range(n - 3):
 		# constraints
 		B = []
 		B_t1 = []
@@ -136,13 +141,13 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 		reshaped_residuals_t2.append(int_residuals[1][1])
 
 		temp = [-1 * e1[i][j] <= reshaped_residuals[j] for j in range(len(reshaped_residuals)) ]
-		temp2 = [e1[i][j] <= reshaped_residuals[j] for j in range(len(reshaped_residuals)) ]
+		temp2 = [e1[i][j] >= reshaped_residuals[j] for j in range(len(reshaped_residuals)) ]
 
 		temp3 = [-1 * e2[i][j] <= reshaped_residuals_t1[j] for j in range(len(reshaped_residuals_t1)) ]
-		temp4 = [e2[i][j] <= reshaped_residuals_t1[j] for j in range(len(reshaped_residuals_t1)) ]
+		temp4 = [e2[i][j] >= reshaped_residuals_t1[j] for j in range(len(reshaped_residuals_t1)) ]
 
 		temp5 = [-1 * e3[i][j] <= reshaped_residuals_t2[j] for j in range(len(reshaped_residuals_t2)) ]
-		temp6 = [e3[i][j] <= reshaped_residuals_t2[j] for j in range(len(reshaped_residuals_t2)) ]
+		temp6 = [e3[i][j] >= reshaped_residuals_t2[j] for j in range(len(reshaped_residuals_t2)) ]
 		for t in range(len(temp)):
 			# smoothness constraints
 			prob += temp[t]
@@ -151,26 +156,35 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 			prob += temp4[t]
 			prob += temp5[t]
 			prob += temp6[t]
-			prob += e1[i][0] >= 0
-			prob += e1[i][1] >= 0
-			prob += e1[i][2] >= 0
-			prob += e1[i][3] >= 0
-			prob += e1[i][4] >= 0
-			prob += e1[i][5] >= 0
 
-			prob += e2[i][0] >= 0
-			prob += e2[i][1] >= 0
-			prob += e2[i][2] >= 0
-			prob += e2[i][3] >= 0
-			prob += e2[i][4] >= 0
-			prob += e2[i][5] >= 0
+		# for t in range(n-3, n):
+		# 	for j in range(dof):
+		# 		prob += p[t][j] == p[n - 1][j]
 
-			prob += e3[i][0] >= 0
-			prob += e3[i][1] >= 0
-			prob += e3[i][2] >= 0
-			prob += e3[i][3] >= 0
-			prob += e3[i][4] >= 0
-			prob += e3[i][5] >= 0
+		prob += e1[i][0] >= 0
+		prob += e1[i][1] >= 0
+		prob += e1[i][2] >= 0
+		prob += e1[i][3] >= 0
+		prob += e1[i][4] >= 0
+		prob += e1[i][5] >= 0
+
+		prob += e2[i][0] >= 0
+		prob += e2[i][1] >= 0
+		prob += e2[i][2] >= 0
+		prob += e2[i][3] >= 0
+		prob += e2[i][4] >= 0
+		prob += e2[i][5] >= 0
+
+		prob += e3[i][0] >= 0
+		prob += e3[i][1] >= 0
+		prob += e3[i][2] >= 0
+		prob += e3[i][3] >= 0
+		prob += e3[i][4] >= 0
+		prob += e3[i][5] >= 0
+		# prob += lpSum(e1[i]) >= 0
+		# prob += lpSum(e2[i]) >= 0
+		# prob += lpSum(e3[i]) >= 0
+
 	
 	for i in range(n):
 		# proximity points
@@ -180,8 +194,8 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 		prob += p[i][4] <= 0.1
 		prob += p[i][3] + p[i][4] >= -0.05
 		prob += p[i][3] + p[i][4] <= 0.05
-		prob += p[i][2] + i[i][5] >= -0.1
-		prob += p[i][2] + i[i][5] <= 0.1
+		prob += p[i][2] - p[i][5] >= -0.1
+		prob += p[i][2] - p[i][5] <= 0.1
 		# res = np.dot(p[i],U)
 		# for j in range(len(lb)):
 		# 	prob += lb[j] <= res[j]
@@ -190,28 +204,24 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	for i in range(len(crop_points)):
 		# inclusion
 		for j in range(n):
-			temp1 = np.dot(np.array([1, 0, crop_points[i][0], crop_points[i][1], 0, 0]), np.transpose(p[j])) 
+			temp1 = np.dot(np.transpose(np.array([1, 0, crop_points[i][0], crop_points[i][1], 0, 0])), np.transpose(p[j]))
 			prob += 0 <= temp1
 			prob += vid_width_ >= temp1
 
-			temp2 = np.dot(np.array([0, 1, 0, 0, crop_points[i][0], crop_points[i][1]]), np.transpose(p[j]))
+			temp2 = np.dot(np.transpose(np.array([0, 1, 0, 0, crop_points[i][0], crop_points[i][1]])), np.transpose(p[j]))
 			prob += 0 <= temp2
 			prob += vid_height_ >= temp2
 
-
-
 	prob.solve()
+	pulp.LpStatus[prob.status]
 
-	l = []
 	B = [np.zeros((3,3)) for _ in range(n)]
 	for v in prob.variables():
-		# print v.name, "=", v.varValue
 		# put the values into a B_matrix
 		if 'p_' in v.name:
 			p_name = v.name.split('_')
 			name = p_name[0]
 			idx = int(p_name[1])
-			l.append(idx)
 			coeff_idx = p_name[2]
 
 			if coeff_idx == '0':
@@ -237,23 +247,22 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	# Print the value of the objective
 	print("objective=", value(prob.objective))
 	pickle.dump(F, open("B_albert.p", "wb"))
-	print(max(l))
-	print(min(l))
-	print(len(B))
-	with open('B_albert.csv', 'w+') as csvfile:
-		f_writer = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
-		for b in B:
-			f_writer.writerow([b[0,0]] + [b[0,1]] +  [b[0,2]] + [b[0,0]] + [b[1,1]] +  [b[1,2]] + [b[2,0]] + [b[2,1]] +  [b[2,2]])
-	print('optimal path returning')
+	# with open('B_albert.csv', 'w+') as csvfile:
+	# 	f_writer = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
+	# 	for b in B:
+	# 		f_writer.writerow([b[0,0]] + [b[0,1]] +  [b[0,2]] + [b[0,0]] + [b[1,1]] +  [b[1,2]] + [b[2,0]] + [b[2,1]] +  [b[2,2]])
+	print('optimal path returning with length', len(B))
 	return B
 	# return 0
 
 
-filename = '../media/test_vid_eric.mp4'
+filename = '../media/test1.mp4'
 vid = read_video(filename)
-F, C = estimate_path(vid, method='NN')
-pickle.dump(F, open("F.p", "wb"))
-fc, height, width, rgb = vid.shape
+print 'vid.shape',vid.shape
+F = estimate_path(vid, method='NN')
+pickle.dump(F, open("F_a.p", "wb"))
+# fc, height, width, rgb = vid.shape
 
-# F = pickle.load(open("F.p", "rb"))
-solve_path(F,fc,height, width)
+# F = pickle.load(open("F_a.p", "rb"))
+# B = solve_path(F,fc,height, width)
+# plot_new_path(F,B)

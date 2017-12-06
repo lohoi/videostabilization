@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+'''Reconstruct video'''
+
 import cv2
 import numpy as np
 from estimate_path import estimate_transform

@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+'''
+Helper functions to plot and read videos
+'''
+
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt

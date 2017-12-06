@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 '''Run Video Stabilization Algorithm.'''
 from read_video import *
 from write_video import *
@@ -17,11 +18,12 @@ def main():
     print "Reading video"
     # read video
     # filename = '../media/test_vid_eric.mp4'
-    filename = '../media/test1.mp4'
+    filename = '../media/test_vid_eric.mp4'
     vid = read_video(filename)
 
     print "Creating camera path"
     F = estimate_path(vid, method='NN')
+    plot_path(F)
 
     # pickle.dump(F, open("F.p", "wb"))
     # pickle.dump(C, open("C.p", "wb"))
@@ -31,11 +33,11 @@ def main():
     # plot_path(F)
     # B = pickle.load(open("B_albert.p", "rb"))
 
-    print "Estimating new camera path"
-    crop_ratio = 0.8
-    B = optimizePathTransforms(F, vid.shape, crop_ratio)
-    print type(B)
-    plot_new_path(F,B)
+    # print "Estimating new camera path"
+    # crop_ratio = 0.8
+    # B = optimizePathTransforms(F, vid.shape, crop_ratio)
+    # print type(B)
+    # plot_new_path(F,B)
 
     print "Reconstructing original video with path"
     vid_opt = synthesize_path(vid, B)

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-'''Return 2D parametric linear motion model
-    at each instance of time.'''
+
+'''
+Computes 2D parametric linear motion model (original camera path)
+'''
 import cv2
 import numpy as np
 from helper import *
@@ -16,7 +18,6 @@ def estimate_transform(X, Y):
 
 
 def estimate_path(vid_, method='NN'):
-    # TODO: we can do an analysis on L2 vs NN here for SIFT
     f_count, f_height, f_width, color_scale = vid_.shape
     sift = cv2.SIFT()
     prev_frame = vid_[0]
@@ -52,7 +53,7 @@ def estimate_path(vid_, method='NN'):
         elif method == 'NN':
             matches = bf.knnMatch(prev_des, curr_des, k=2)
             for m, n in matches:
-                if m.distance < 0.50 * n.distance:
+                if m.distance < 0.20 * n.distance:
                     # David Lowe's NN ratio test
                     parsed_matches.append(m)
 
@@ -81,10 +82,14 @@ def estimate_path(vid_, method='NN'):
         # A[2,1] = 0
         # F.append(A)
 
-        src_pts = np.float32([prev_kp[m.queryIdx].pt for m in parsed_matches]).reshape(-1,1,2)
-        dst_pts = np.float32([curr_kp[m.trainIdx].pt for m in parsed_matches]).reshape(-1,1,2)
+        src_pts = np.float32([curr_kp[m.trainIdx].pt for m in parsed_matches]).reshape(-1,1,2)
+        dst_pts = np.float32([prev_kp[m.queryIdx].pt for m in parsed_matches]).reshape(-1,1,2)
 
-        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC)
+
+        M = cv2.estimateRigidTransform(src_pts, dst_pts, False)
+
+        M = np.append(M,np.zeros((1,3)),axis=0)
+        M[2,2] = 1
         F.append(M)
 
 
