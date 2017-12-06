@@ -43,8 +43,10 @@ def plot_new_path(F_,B_):
         new_Y.append(temp[1,0])
     plt.subplot(1,2,1)
     plt.plot(frames,old_X,'r--',frames,new_X,'b--')
+    plt.title("Motion in X")
     plt.subplot(1,2,2)
     plt.plot(frames,old_Y,'r--',frames,new_Y,'b--')
+    plt.title("Motion in Y")
     plt.show()
 
 def draw_matches(img1, kp1, img2, kp2, matches):
