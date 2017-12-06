@@ -4,6 +4,7 @@
 import csv
 import numpy as np
 import pickle
+import subprocess
 
 def optimizePathTransforms(F, vid_shape, crop_ratio):
     # Writes the F to a CSV to be called by the matlab code
