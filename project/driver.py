@@ -15,24 +15,25 @@ def main():
     '''Main Driver.'''
 
     # read video
-    filename = '../media/test_vid_eric.mp4'
+    # filename = '../media/test_vid_eric.mp4'
+    filename = '../media/test1.mp4'
     vid = read_video(filename)
 
     # 1.) Estimate original camera path
-    # F, C = estimate_path(vid, method='NN')
+    F, C = estimate_path(vid, method='NN')
 
     # pickle.dump(F, open("F.p", "wb"))
     # pickle.dump(C, open("C.p", "wb"))
 
-    F = pickle.load(open("F.p", "rb"))
-    C = pickle.load(open("C.p", "rb"))
+    # F = pickle.load(open("F.p", "rb"))
+    # C = pickle.load(open("C.p", "rb"))
 
     # print F[0]
 
     # 2.) Estimate new camera path
     crop_ratio = 0.8
     B = optimizePathTransforms(F, vid.shape, crop_ratio)
-    
+    # B = pickle.load(open("B_albert.p", "rb"))
     # path = []
     # F_cum = []
     # F_cum.append(F[0])
@@ -43,7 +44,7 @@ def main():
     # plot_path(path)
 
     # 3.) Synthesize video with new camera path
-    vid_opt = synthesize_path(vid, C)
+    vid_opt = synthesize_path(vid, B, crop_ratio)
 
     # write video
     write_video('../output.mp4', vid_opt)
