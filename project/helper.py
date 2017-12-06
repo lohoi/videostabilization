@@ -8,12 +8,43 @@ def play_video(filename):
 
 def plot_path(C_):
     '''Plot estimated path'''
-    X = []
-    Y = []
-    for path in C_:
-        X.append(path[0,2])
-        Y.append(path[1,2])
-    plt.plot(X,Y,'r--')
+    point = np.array([[0],[0],[1]])
+    frames = np.arange(len(C_) + 1)
+    frame_cum = np.eye(3)
+    X = [0]
+    Y = [0]
+    for transform in C_:
+        frame_cum = np.dot(frame_cum, transform)
+        temp_point = np.dot(frame_cum, point)
+        X.append(temp_point[0,0])
+        Y.append(temp_point[1,0])
+    plt.subplot(1,2,1)
+    plt.plot(frames,X,'r--')
+    plt.subplot(1,2,2)
+    plt.plot(frames,Y,'r--')
+    plt.show()
+
+def plot_new_path(C_,B_):
+    '''Plot estimated path'''
+    point = np.array([[0],[0],[1]])
+    frames = np.arange(len(C_))
+    frame_cum = np.eye(3)
+    old_X = []
+    old_Y = []
+    new_X = []
+    new_Y = []
+    for ind, transform in enumerate(C_):
+        frame_cum = np.dot(frame_cum, transform)
+        temp_point = np.dot(frame_cum, point)
+        old_X.append(temp_point[0,0])
+        old_Y.append(temp_point[1,0])
+        temp = np.dot(np.dot(frame_cum, B_[ind]),point)
+        new_X.append(temp[0,0])
+        new_Y.append(temp[1,0])
+    plt.subplot(1,2,1)
+    plt.plot(frames,old_X,'r--',frames,new_X,'b--')
+    plt.subplot(1,2,2)
+    plt.plot(frames,old_Y,'r--',frames,new_Y,'b--')
     plt.show()
 
 def draw_matches(img1, kp1, img2, kp2, matches):
@@ -26,8 +57,8 @@ def draw_matches(img1, kp1, img2, kp2, matches):
     contrary to David Lowe's nearest-neighbor ratio-test as described
     in his SIFT paper.
 
-    This function takes in two images with their associated 
-    keypoints, as well as a list of DMatch data structure (matches) 
+    This function takes in two images with their associated
+    keypoints, as well as a list of DMatch data structure (matches)
     that contains which keypoints matched in which images.
 
     An image will be produced where a montage is shown with
@@ -37,7 +68,7 @@ def draw_matches(img1, kp1, img2, kp2, matches):
     between matching keypoints.
 
     img1,img2 - Grayscale images
-    kp1,kp2 - Detected list of keypoints through any of the OpenCV keypoint 
+    kp1,kp2 - Detected list of keypoints through any of the OpenCV keypoint
               detection algorithms
     matches - A list of matches of corresponding keypoints through any
               OpenCV keypoint matching algorithm
@@ -79,7 +110,7 @@ def draw_matches(img1, kp1, img2, kp2, matches):
         # radius 4
         # colour blue
         # thickness = 1
-        cv2.circle(out, (int(x1),int(y1)), 4, (255, 0, 0), 1)   
+        cv2.circle(out, (int(x1),int(y1)), 4, (255, 0, 0), 1)
         cv2.circle(out, (int(x2)+cols1,int(y2)), 4, (255, 0, 0), 1)
 
         # Draw a line in between the two points

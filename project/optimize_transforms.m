@@ -69,12 +69,21 @@ subject to
 cvx_end
 % end LP
 p_values = p;
+for i=1:f_len
+    p_values(:,i) = p2p(p_values(:,i));
+end
+
 end
 
 function B = p_to_b_mat(p)
-B = [p(3) p(4) p(1); p(5) p(6) p(2); 0 0 1];
+    B = [p(3) p(4) p(1); p(5) p(6) p(2); 0 0 1];
 end
 
 function p = mat_to_col(R)
-p = [R(1,3) R(2,3) R(1,1) R(1,2) R(2,1) R(2,2)]';
+    p = [R(1,3) R(2,3) R(1,1) R(1,2) R(2,1) R(2,2)]';
 end
+
+function p = p2p(p)
+    p = [p(3) p(4) p(1) p(5) p(6) p(2)]';
+end
+

@@ -1,0 +1,2 @@
+call_optimize_transforms
+exit
