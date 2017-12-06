@@ -25,29 +25,29 @@ def main():
     # pickle.dump(F, open("F.p", "wb"))
     # pickle.dump(C, open("C.p", "wb"))
 
-    # F = pickle.load(open("F.p", "rb"))
-    # C = pickle.load(open("C.p", "rb"))
-
-    # print F[0]
+    F = pickle.load(open("F.p", "rb"))
+    C = pickle.load(open("C.p", "rb"))
+    #plot_path(F)
+    B = pickle.load(open("B_albert.p", "rb"))
+    plot_new_path(F,B)
 
     # 2.) Estimate new camera path
-    crop_ratio = 0.8
-    B = optimizePathTransforms(F, vid.shape, crop_ratio)
-    # B = pickle.load(open("B_albert.p", "rb"))
-    # path = []
-    # F_cum = []
-    # F_cum.append(F[0])
-    # path.append(np.dot(F[0],B[0]))
-    # for t in range(1,len(F)):
-    #     F_cum.append(np.dot(F[t], F_cum[t-1]))
-    #     path.append(np.dot(F_cum[t],B[t]))
-    # plot_path(path)
+    #crop_ratio = 0.8
+    #B = optimizePathTransforms(F, vid.shape, crop_ratio)
+    #path = []
+    #F_cum = []
+    #F_cum.append(F[0])
+    #path.append(np.dot(F[0],B[0]))
+    #for t in range(1,len(F)):
+    #    F_cum.append(np.dot(F[t], F_cum[t-1]))
+    #    path.append(np.dot(F_cum[t],B[t]))
+    #plot_path(path)
 
     # 3.) Synthesize video with new camera path
-    vid_opt = synthesize_path(vid, B, crop_ratio)
+    #vid_opt = synthesize_path(vid, C)
 
     # write video
-    write_video('../output.mp4', vid_opt)
+    #write_video('../output.mp4', vid_opt)
 
 if __name__ == "__main__":
     main()
