@@ -8,12 +8,43 @@ def play_video(filename):
 
 def plot_path(C_):
     '''Plot estimated path'''
-    X = []
-    Y = []
-    for path in C_:
-        X.append(path[0,2])
-        Y.append(path[1,2])
-    plt.plot(X,Y,'r--')
+    point = np.array([[0],[0],[1]])
+    frames = np.arange(len(C_) + 1)
+    frame_cum = np.eye(3)
+    X = [0]
+    Y = [0]
+    for transform in C_:
+        frame_cum = np.dot(frame_cum, transform)
+        tep_point = np.dot(frame_cum, point)
+        X.append(temp_point[0,0])
+        Y.append(temp_point[1,0])
+    plt.subplot(1,2,1)
+    plt.plot(frames,X,'r--')
+    plt.subplot(1,2,2)
+    plt.plot(frames,Y,'r--')
+    plt.show()
+
+def plot_new_path(C_,B_):
+    '''Plot estimated path'''
+    point = np.array([[0],[0],[1]])
+    frames = np.arange(len(C_))
+    frame_cum = np.eye(3)
+    old_X = []
+    old_Y = []
+    new_X = []
+    new_Y = []
+    for ind, transform in enumerate(C_):
+        frame_cum = np.dot(frame_cum, transform)
+        temp_point = np.dot(frame_cum, point)
+        old_X.append(temp_point[0,0])
+        old_Y.append(temp_point[1,0])
+        temp = np.dot(np.dot(frame_cum, B_[ind]),point)
+        new_X.append(temp[0,0])
+        new_Y.append(temp[1,0])
+    plt.subplot(1,2,1)
+    plt.plot(frames,old_X,'r--',frames,new_X,'b--')
+    plt.subplot(1,2,2)
+    plt.plot(frames,old_Y,'r--',frames,new_Y,'b--')
     plt.show()
 
 def draw_matches(img1, kp1, img2, kp2, matches):
