@@ -7,7 +7,7 @@ import pickle
 from random import *
 
 
-def solve_path(F_, fc_, vid_height_, vid_width_):
+def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	print 'solve_path called with number of frames: ', fc_
 	prob = LpProblem('vidstab', pulp.LpMinimize)
 
@@ -20,12 +20,9 @@ def solve_path(F_, fc_, vid_height_, vid_width_):
 
 	ub = [1.1, 0.1, 0.1, 1.1, 0.1, 0.05]
 
-	# Size of the integers involved
-	D = 100
-
 	# Number of variables
-	n = fc # todo, change this to fc later
-	dof = 6
+	n = fc_ # todo, change this to fc later
+	dof = 6 # affine transform
 
 	U = np.zeros((6,6))
 	U[2, 0] = 1
@@ -36,6 +33,18 @@ def solve_path(F_, fc_, vid_height_, vid_width_):
 	U[5, 4] = -1
 	U[3, 5] = 1
 	U[4, 5] = 1
+
+	center_x = int(vid_width_ / 2);
+	center_y = int(vid_height_ / 2);
+	crop_w = int(vid_width_ * crop_ratio_);
+	crop_h = int(vid_height_ * crop_ratio_);
+	crop_x = int(center_x - crop_w / 2);
+	crop_y = int(center_y - crop_h / 2);
+	crop_points = [ [crop_x, crop_y],
+	                [crop_x + crop_w, crop_y],
+	                [crop_x, crop_y + crop_h],
+	                [crop_x + crop_w, crop_y + crop_h]
+	            ];
 
 	# A vector of n binary variables
 	# 	x = LpVariable.matrix("x", list(range(fc)), 0, 1, LpInteger)
@@ -173,16 +182,59 @@ def solve_path(F_, fc_, vid_height_, vid_width_):
 			prob += lb[j] <= res[j]
 			prob += ub[j] >= res[j]
 
+	for i in range(len(crop_points)):
+		# inclusion
+		for j in range(fc_):
+			temp1 = np.dot(np.array([1, 0, crop_points[i][0], crop_points[i][1], 0, 0]), np.transpose(p[j])) 
+			prob += 0 <= temp1
+			prob += vid_width_ >= temp1
+
+			temp2 = np.dot(np.array([0, 1, 0, 0, crop_points[i][0], crop_points[i][1]]), np.transpose(p[j]))
+			prob += 0 <= temp2
+			prob += vid_height_ >= temp2
+
+
 
 	prob.solve()
-	# # # Print the value of the variables at the optimum
+
+	l = []
+	B = [np.zeros((3,3)) for _ in range(fc)]
 	for v in prob.variables():
-		if 'p' in v.name:
-			print(v.name, "=", v.varValue)
+		# print v.name, "=", v.varValue
+		# put the values into a B_matrix
+		if 'p_' in v.name:
+			p_name = v.name.split('_')
+			name = p_name[0]
+			idx = int(p_name[1])
+			l.append(idx)
+			coeff_idx = p_name[2]
+
+			if coeff_idx == '0':
+				# dx
+				B[idx][0,2] = v.varValue
+			elif coeff_idx == '1':
+				# dy
+				B[idx][1,2] = v.varValue
+			elif coeff_idx == '2':
+				# a
+				B[idx][0,0] = v.varValue
+			elif coeff_idx == '3':
+				# b
+				B[idx][0,1] = v.varValue
+			elif coeff_idx == '4':
+				# c
+				B[idx][1,0] = v.varValue
+			elif coeff_idx == '5':
+				# d
+				B[idx][1,1] = v.varValue
+			else:
+				B[idx][2,2] = 1
 
 	# Print the value of the objective
 	print("objective=", value(prob.objective))
-	return prob.objective
+	pickle.dump(F, open("B_albert.p", "wb"))
+	print('optimial path returning')
+	return B
 	# return 0
 
 

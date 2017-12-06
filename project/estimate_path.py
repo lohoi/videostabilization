@@ -75,7 +75,7 @@ def estimate_path(vid_, method='NN'):
         assert width1 == width2, 'estimate path: width mismatch'
         assert width1 == 2, 'estimate path: incorrect width'
 
-        A = estimate_transform(parsed_matches, X, Y)
+        A = estimate_transform(X, Y)
         A = np.append(A, np.ones((1,3)), axis=0)
         A[2,0] = 0
         A[2,1] = 0
