@@ -24,23 +24,32 @@ def plot_path(C_):
     plt.plot(frames,Y,'r--')
     plt.show()
 
-def plot_new_path(C_,B_):
+def plot_new_path(F, B):
     '''Plot estimated path'''
-    point = np.array([[0],[0],[1]])
-    frames = np.arange(len(C_))
-    frame_cum = np.eye(3)
+    # point = np.array([[0],[0],[1]])
+    frames = np.arange(len(F))
+    path = np.array([[0],[0],[1]])
+    temp_points = []
     old_X = []
     old_Y = []
     new_X = []
     new_Y = []
-    for ind, transform in enumerate(C_):
-        frame_cum = np.dot(frame_cum, transform)
-        temp_point = np.dot(frame_cum, point)
-        old_X.append(temp_point[0,0])
-        old_Y.append(temp_point[1,0])
-        temp = np.dot(np.dot(frame_cum, B_[ind]),point)
-        new_X.append(temp[0,0])
-        new_Y.append(temp[1,0])
+    old_path = []
+    new_path = []
+    old_new_path = np.eye(3)
+
+    for ind, transform in enumerate(F):
+        path = np.dot(transform, path)
+        old_X.append(path[0,0])
+        old_Y.append(path[1,0])
+
+    path = np.array([[0],[0],[1]])
+    for ind, transform in enumerate(F):
+        t = np.dot(transform, B[ind])
+        path = np.dot(t, path)
+        new_X.append(path[0,0])
+        new_Y.append(path[1,0])
+
     plt.subplot(1,2,1)
     plt.plot(frames,old_X,'r--',frames,new_X,'b--')
     plt.subplot(1,2,2)

@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from helper import *
 
+# Our own linear least squares implementation to estimate affine transformation
 def estimate_transform(X, Y):
     '''Input: list of match objects
     Return: a 2x3 affine transform matrix
@@ -14,9 +15,7 @@ def estimate_transform(X, Y):
     # factors in the tails. Try RANSAC in future?
     return np.dot(np.dot(np.linalg.pinv(np.dot(np.transpose(X), X)), np.transpose(X)), Y)
 
-
 def estimate_path(vid_, method='NN'):
-    # TODO: we can do an analysis on L2 vs NN here for SIFT
     f_count, f_height, f_width, color_scale = vid_.shape
     sift = cv2.SIFT()
     prev_frame = vid_[0]
@@ -33,12 +32,15 @@ def estimate_path(vid_, method='NN'):
         # 7.1.) Keypoint matching of the SIFT paper
         bf = cv2.BFMatcher()
 
+    # Fine homography between consecutive frames
     for i in range(1, f_count):
         next_frame = vid_[i]
         curr_kp, curr_des = sift.detectAndCompute(next_frame, None)
 
         matches = None
         parsed_matches = []
+
+        # We found that NN works better
         if method == 'L2':
             matches = bf.match(prev_des, curr_des)
             # Sort them in the order of their distance.
@@ -52,11 +54,29 @@ def estimate_path(vid_, method='NN'):
         elif method == 'NN':
             matches = bf.knnMatch(prev_des, curr_des, k=2)
             for m, n in matches:
-                if m.distance < 0.50 * n.distance:
+                if m.distance < 0.1 * n.distance:
                     # David Lowe's NN ratio test
                     parsed_matches.append(m)
+            if len(parsed_matches) < 10:
+                for m, n in matches:
+                    if m.distance < 0.2 * n.distance:
+                        parsed_matches.append(m)
+            if len(parsed_matches) < 10:
+                for m, n in matches:
+                    if m.distance < 0.3 * n.distance:
+                        parsed_matches.append(m)
+            if len(parsed_matches) < 10:
+                for m, n in matches:
+                    if m.distance < 0.5 * n.distance:
+                        parsed_matches.append(m)
+            if len(parsed_matches) < 10:
+                print "Cannot find enough feature matches between frames"
 
-        # draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
+        if i == 150:
+            draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
+        print "Estimating path of frame {}".format(i)
+
+        # We tried linear least squares, but results were not as good as RANSAC
         # X = []
         # Y = []
         # for m in parsed_matches:
@@ -81,12 +101,12 @@ def estimate_path(vid_, method='NN'):
         # A[2,1] = 0
         # F.append(A)
 
-        src_pts = np.float32([prev_kp[m.queryIdx].pt for m in parsed_matches]).reshape(-1,1,2)
-        dst_pts = np.float32([curr_kp[m.trainIdx].pt for m in parsed_matches]).reshape(-1,1,2)
-
+        # Find transfrom from current to previous, which is frame-by-frame camera path (instead of image path)
+        src_pts = np.float32([curr_kp[m.trainIdx].pt for m in parsed_matches]).reshape(-1,1,2)
+        dst_pts = np.float32([prev_kp[m.queryIdx].pt for m in parsed_matches]).reshape(-1,1,2)
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC)
-        F.append(M)
 
+        F.append(M)
 
         # print np.append(X[1],np.ones(1))
         # print A
@@ -98,17 +118,8 @@ def estimate_path(vid_, method='NN'):
         prev_des = curr_des
     assert len(F) == f_count-1, 'estimate_path: frames mismatch'
 
-    '''Given the pairwise transforms, plot the estimated path'''
-    num_frames = len(F)
-    F = np.array(F)
-    # C = []
-    # C.append(F[0])
-    #
-    # # plot_path(F)
-    #
-    # for i in range(1, len(F)):
-    #     C.append(np.dot(F[i], C[i-1]))
-    #
-    # # plot_path(C)
+    C = [np.eye(3)]
+    for i, f in enumerate(F):
+        C.append(np.dot(C[i], f))
 
-    return F
+    return F, C

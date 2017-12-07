@@ -1,3 +1,4 @@
+% Input values in saved .csv, output in .csv
 dims = csvread('dim.csv');
 num_frames = dims(1);
 height = dims(2);
@@ -12,6 +13,8 @@ for i=1:num_frames-1
 end
 
 crop_ratio = 0.8;
+
+% Version 1 of linear programming
 p_values = optimize_transforms(F, dims, crop_ratio);
 p_csv = zeros(num_frames-1, 6);
 for i=1:num_frames-1
@@ -19,9 +22,10 @@ for i=1:num_frames-1
 end
 csvwrite('p.csv', p_csv);
 
-ps_values = cell2mat(optimizeTransforms(F, dims));
+% Versioan 2 of linear programming
+p2_values = cell2mat(optimize_transforms_2(F, dims));
 for i=1:num_frames-1
     j = (i-1) * 3 + 1;
-    ps_csv(i,:) = [ps_values(j,:), ps_values(j+1,:)];
+    p2_csv(i,:) = [p2_values(j,:), p2_values(j+1,:)];
 end
-csvwrite('p_ishit.csv', ps_csv);
+csvwrite('p2.csv', p2_csv);

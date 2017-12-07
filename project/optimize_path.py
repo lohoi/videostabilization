@@ -22,7 +22,8 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
 
     # Read resulting csv from matlab code
     p = []
-    with open('p_ishit.csv', 'rb') as csvfile:
+    # Version 2 of linear programming solver is better p.csv vs p2.csv
+    with open('p2.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
             row_count = 0
