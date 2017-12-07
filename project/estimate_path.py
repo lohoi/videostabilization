@@ -74,8 +74,8 @@ def estimate_path(vid_, method='NN'):
             if len(parsed_matches) < 10:
                 print "Cannot find enough feature matches between frames"
 
-        if i == 150:
-            draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
+        # if i == 150:
+        #     draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
         print "Estimating path of frame {}".format(i)
 
         # We tried linear least squares, but results were not as good as RANSAC
