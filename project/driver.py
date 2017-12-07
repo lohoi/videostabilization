@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 '''Run Video Stabilization Algorithm.'''
 from read_video import *
 from write_video import *

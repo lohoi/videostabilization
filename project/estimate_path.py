@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-'''Return 2D parametric linear motion model
-    at each instance of time.'''
+
+'''
+Computes 2D parametric linear motion model (original camera path)
+'''
 import cv2
 import numpy as np
 from helper import *

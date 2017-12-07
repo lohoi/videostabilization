@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+'''
+Attempt to solve linear program problem with Matlab library
+'''
+
 #import matlab.engine
 import csv
 import numpy as np

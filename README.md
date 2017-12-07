@@ -7,12 +7,12 @@ Dependencies:
 python 2.7\\
 opencv 2.4.11\\
 sk-video\\
-numpy
-matlab 2016b
-cvx for matlab
+numpy\\
+matlab 2016b\\
+cvx for matlab\\
 ...
 ## Usage
-	Run `python driver.py` within the project directory.
+	Run `python driver.py` within `project/`
 
 ## Project Schema
     1. Estimating the original path

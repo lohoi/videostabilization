@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+'''
+Helper functions to plot and read videos
+'''
+
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
@@ -6,14 +12,14 @@ def play_video(filename):
     '''Plays video.'''
     pass
 
-def plot_path(C_):
+def plot_path(F_):
     '''Plot estimated path'''
     point = np.array([[0],[0],[1]])
-    frames = np.arange(len(C_) + 1)
+    frames = np.arange(len(F_) + 1)
     frame_cum = np.eye(3)
     X = [0]
     Y = [0]
-    for transform in C_:
+    for transform in F_:
         frame_cum = np.dot(frame_cum, transform)
         temp_point = np.dot(frame_cum, point)
         X.append(temp_point[0,0])
@@ -52,8 +58,10 @@ def plot_new_path(F, B):
 
     plt.subplot(1,2,1)
     plt.plot(frames,old_X,'r--',frames,new_X,'b--')
+    plt.title("Motion in X")
     plt.subplot(1,2,2)
     plt.plot(frames,old_Y,'r--',frames,new_Y,'b--')
+    plt.title("Motion in Y")
     plt.show()
 
 def draw_matches(img1, kp1, img2, kp2, matches):
