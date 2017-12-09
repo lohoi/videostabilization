@@ -24,10 +24,9 @@ def optimizePathTransforms(F, vid_shape, crop_ratio):
     print "Calling Matlab CVX"
     subprocess.call("/Applications/MATLAB.app/bin/matlab -r matlab_opt_transform rm -nodisplay", shell=True)
 
-    # Read resulting csv from matlab code
+    # Read resulting path csv from matlab code
     p = []
-    # Version 2 of linear programming solver is better p.csv vs p2.csv
-    with open('p2.csv', 'rb') as csvfile:
+    with open('p.csv', 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
             row_count = 0

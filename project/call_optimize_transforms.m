@@ -21,11 +21,3 @@ for i=1:num_frames-1
     p_csv(i,:) = p_values(:,i)';
 end
 csvwrite('p.csv', p_csv);
-
-% Versioan 2 of linear programming
-p2_values = cell2mat(optimize_transforms_2(F, dims));
-for i=1:num_frames-1
-    j = (i-1) * 3 + 1;
-    p2_csv(i,:) = [p2_values(j,:), p2_values(j+1,:)];
-end
-csvwrite('p2.csv', p2_csv);
