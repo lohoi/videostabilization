@@ -15,7 +15,7 @@ import csv
 from estimate_path import *
 
 
-def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
+def solve_path(F, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	print 'solve_path called'
 	print 'width: ', vid_width_
 	print 'height: ', vid_height_
@@ -43,29 +43,27 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	center_y = int(vid_width_ / 2);
 	crop_w = int(vid_width_ * crop_ratio_);
 	crop_h = int(vid_height_ * crop_ratio_);
-	
+
 
 	crop_x = int(center_x - crop_h / 2);
 	crop_y = int(center_y - crop_w / 2);
 	crop_points = [
 					[crop_x, crop_y],
-	                [crop_x + crop_h, crop_y],
-	                [crop_x, crop_y + crop_w],
-	                [crop_x + crop_h, crop_y + crop_w]
-	            ];
-
-	print crop_points
+					[crop_x + crop_h, crop_y],
+					[crop_x, crop_y + crop_w],
+					[crop_x + crop_h, crop_y + crop_w]
+				];
 
 	# Slacks
 	# c = LpVariable.matrix("c", (c1,c1), 0)
 	e1 = LpVariable.matrix('e1', (list(range(n)), list(range(dof))))
 	e2 = LpVariable.matrix('e2', (list(range(n)), list(range(dof))))
 	e3 = LpVariable.matrix('e3', (list(range(n)), list(range(dof))))
-	p = LpVariable.matrix('p', (list(range(n+1)), list(range(dof))))
+	p = LpVariable.matrix('p', (list(range(n)), list(range(dof))))
 
 	# Objective: minimize c'e
 	prob += lpSum(w1 * np.dot(e1, c1) + w2 * np.dot(e2,c2) + w3 * np.dot(e3,c3))
-	# prob +=  lpSum([c1[i] * e1[i] for i in range(len(c1))]) 
+	# prob +=  lpSum([c1[i] * e1[i] for i in range(len(c1))])
 	for i in range(n - 3):
 		# constraints
 		B = []
@@ -157,10 +155,6 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 			prob += temp5[t]
 			prob += temp6[t]
 
-		# for t in range(n-3, n):
-		# 	for j in range(dof):
-		# 		prob += p[t][j] == p[n - 1][j]
-
 		prob += e1[i][0] >= 0
 		prob += e1[i][1] >= 0
 		prob += e1[i][2] >= 0
@@ -181,11 +175,7 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 		prob += e3[i][3] >= 0
 		prob += e3[i][4] >= 0
 		prob += e3[i][5] >= 0
-		# prob += lpSum(e1[i]) >= 0
-		# prob += lpSum(e2[i]) >= 0
-		# prob += lpSum(e3[i]) >= 0
 
-	
 	for i in range(n):
 		# proximity points
 		prob += p[i][2] >= 0.9
@@ -196,21 +186,20 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 		prob += p[i][3] + p[i][4] <= 0.05
 		prob += p[i][2] - p[i][5] >= -0.1
 		prob += p[i][2] - p[i][5] <= 0.1
-		# res = np.dot(p[i],U)
-		# for j in range(len(lb)):
-		# 	prob += lb[j] <= res[j]
-		# 	prob += ub[j] >= res[j]
 
 	for i in range(len(crop_points)):
 		# inclusion
 		for j in range(n):
-			temp1 = np.dot(np.transpose(np.array([1, 0, crop_points[i][0], crop_points[i][1], 0, 0])), np.transpose(p[j]))
+			temp1 = np.dot(np.array([1, 0, crop_points[i][0], crop_points[i][1], 0, 0]), np.transpose(p[j]))
 			prob += 0 <= temp1
-			prob += vid_width_ >= temp1
+			prob += vid_height_ >= temp1
 
-			temp2 = np.dot(np.transpose(np.array([0, 1, 0, 0, crop_points[i][0], crop_points[i][1]])), np.transpose(p[j]))
+			temp2 = np.dot(np.array([0, 1, 0, 0, crop_points[i][0], crop_points[i][1]]), np.transpose(p[j]))
 			prob += 0 <= temp2
-			prob += vid_height_ >= temp2
+			prob += vid_width_ >= temp2
+	for t in range(n-3, n):
+		for j in range(dof):
+			prob += p[t][j] == p[n - 1][j]
 
 	prob.solve()
 	pulp.LpStatus[prob.status]
@@ -256,13 +245,13 @@ def solve_path(F_, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 	# return 0
 
 
-filename = '../media/test1.mp4'
-vid = read_video(filename)
-print 'vid.shape',vid.shape
-F = estimate_path(vid, method='NN')
-pickle.dump(F, open("F_a.p", "wb"))
+# filename = '../media/test_vid_eric.mp4'
+# vid = read_video(filename)
+# # print 'vid.shape', vid.shape
+# F = estimate_path(vid, method='NN')
+# pickle.dump(F, open("F_a.p", "wb"))
 # fc, height, width, rgb = vid.shape
-
-# F = pickle.load(open("F_a.p", "rb"))
+# # F = pickle.load(open("F_a.p", "rb"))
+# print "solving path"
 # B = solve_path(F,fc,height, width)
 # plot_new_path(F,B)

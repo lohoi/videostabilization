@@ -76,7 +76,7 @@ def estimate_path(vid_, method='NN'):
 
         # if i == 150:
         #     draw_matches(vid_[0], prev_kp, vid_[1], curr_kp, parsed_matches)
-        print "Estimating path of frame {}".format(i)
+        # print "Estimating path of frame {}".format(i)
 
         # We tried linear least squares, but results were not as good as RANSAC
         # X = []
@@ -107,7 +107,6 @@ def estimate_path(vid_, method='NN'):
         src_pts = np.float32([curr_kp[m.trainIdx].pt for m in parsed_matches]).reshape(-1,1,2)
         dst_pts = np.float32([prev_kp[m.queryIdx].pt for m in parsed_matches]).reshape(-1,1,2)
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC)
-
         F.append(M)
 
         # print np.append(X[1],np.ones(1))
@@ -120,8 +119,8 @@ def estimate_path(vid_, method='NN'):
         prev_des = curr_des
     assert len(F) == f_count-1, 'estimate_path: frames mismatch'
 
-    C = [np.eye(3)]
-    for i, f in enumerate(F):
-        C.append(np.dot(C[i], f))
+    # C = [np.eye(3)]
+    # for i, f in enumerate(F):
+    #     C.append(np.dot(C[i], f))
 
-    return F, C
+    return F
