@@ -7,6 +7,7 @@ from estimate_path import *
 from optimize_path import *
 from synthesize_path import *
 from helper import *
+from solve_path import *
 
 import numpy as np
 import pickle
@@ -24,12 +25,12 @@ def main():
 
     # Step 1
     print "Creating camera path"
-    F, C = estimate_path(vid, method='NN')
+    F = estimate_path(vid, method='NN')
 
     # Step 2
     print "Estimating new camera path"
     crop_ratio = 0.8
-    B = optimizePathTransforms(F, vid.shape, crop_ratio)
+    B = solve_path(F, frames, height, width, crop_ratio)
 
     print "Plotting camera paths - close window to continue"
     plot_new_path(F, B)
