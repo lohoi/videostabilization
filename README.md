@@ -9,9 +9,7 @@ sk-video <br/>
 numpy <br/>
 matlab 2016b <br/>
 cvx for matlab <br/>
-<br/>
-(Optional: for solve_path.py) 
-Install PuLP : https://scaron.info/blog/linear-programming-in-python-with-pulp.html <br/>
+PuLP : https://scaron.info/blog/linear-programming-in-python-with-pulp.html <br/>
 ## Usage
 Run `python driver.py` within `project/`
 

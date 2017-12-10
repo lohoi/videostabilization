@@ -19,18 +19,23 @@ def main():
     print "Reading video"
     # read video
     # filename = '../media/test_vid_eric.mp4'
-    filename = '../media/test_selfie.mp4'
+    # filename = '../media/test_selfie.mp4'
+    filename = '../media/albert2.mp4'
     vid = read_video(filename)
     [frames, height, width, chan] = vid.shape
 
     # Step 1
     print "Creating camera path"
+    # F = pickle.load(open("F.p", "rb"))
     F = estimate_path(vid, method='NN')
+    pickle.dump(F, open("F.p", "wb"))
 
     # Step 2
     print "Estimating new camera path"
     crop_ratio = 0.8
+    # B = pickle.load(open("B.p", "rb"))
     B = solve_path(F, frames, height, width, crop_ratio)
+    pickle.dump(F, open("B.p", "wb"))
 
     print "Plotting camera paths - close window to continue"
     plot_new_path(F, B)

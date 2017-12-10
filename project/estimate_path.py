@@ -107,9 +107,12 @@ def estimate_path(vid_, method='NN'):
         src_pts = np.float32([curr_kp[m.trainIdx].pt for m in parsed_matches]).reshape(-1,1,2)
         dst_pts = np.float32([prev_kp[m.queryIdx].pt for m in parsed_matches]).reshape(-1,1,2)
         M = cv2.estimateRigidTransform(src_pts, dst_pts, True)
-        M = np.append(M, np.ones((1,3)), axis=0)
-        M[0,0] = 0
-        M[0,1] = 0
+        M = np.append(M,np.ones((1,3)), axis=0)
+        M[2,0] = 0
+        M[2,1] = 0
+        # M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC)
+        # M[2,0] = 0
+        # M[2,1] = 0
         F.append(M)
 
         # print np.append(X[1],np.ones(1))

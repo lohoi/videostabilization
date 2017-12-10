@@ -235,7 +235,7 @@ def solve_path(F, fc_, vid_height_, vid_width_, crop_ratio_= 0.8):
 
 	# Print the value of the objective
 	print("objective=", value(prob.objective))
-	pickle.dump(F, open("B_albert.p", "wb"))
+	# pickle.dump(F, open("B_albert.p", "wb"))
 	# with open('B_albert.csv', 'w+') as csvfile:
 	# 	f_writer = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
 	# 	for b in B:
