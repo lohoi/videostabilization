@@ -72,7 +72,7 @@ def synthesize_path(vid_, p_opt, crop_ratio = 0.8):
         # m_recon, mask = cv2.findHomography(np.array(crop_corns), np.array(orig_corns), cv2.RANSAC)
         # vid_recon[i] = cv2.warpPerspective(vid[i], m_recon, (f_width,f_height))
 
-        m_recon, mask = cv2.estimateRigidTransform(np.array(crop_corns), np.array(orig_corns), false)
+        m_recon, mask = cv2.estimateRigidTransform(np.array(crop_corns), np.array(orig_corns), False)
         vid_recon[i] = cv2.warpAffine(vid[i], m_recon, (f_width,f_height))
 
         if i == 100 or i == 101:
